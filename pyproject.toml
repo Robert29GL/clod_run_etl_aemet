@@ -8,7 +8,7 @@ authors = [{name = "Robert Gavilanes", email = "r.gavilanes@altostratus.es"}]
 dependencies = []
 
 [tool.setuptools]
-packages = ["cloud_run_etl_aemet"]
+packages = { find = { where = ["src"] } }
 
 
 [tool.uv]
