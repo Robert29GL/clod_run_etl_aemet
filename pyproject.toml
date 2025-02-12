@@ -4,11 +4,8 @@ version = "0.1.0"
 description = "extract data from api aemet"
 readme = "README.md"
 requires-python = ">=3.11"
-<<<<<<< HEAD
+
 authors = ["Robert Gavilanes <r.gavilanes@altostratus.es>"]
-=======
->>>>>>> a4312fe (init changes)
-dependencies = []
 
 [tool.uv]
 package = true
