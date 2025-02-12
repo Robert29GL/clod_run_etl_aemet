@@ -1,7 +1,7 @@
 [project]
 name = "cloud-run-etl-aemet"
 version = "0.1.0"
-description = "extract data from api aemet"
+description = "Extract data from API AEMET"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{name = "Robert Gavilanes", email = "r.gavilanes@altostratus.es"}]
@@ -10,8 +10,6 @@ dependencies = []
 [tool.setuptools]
 packages = ["cloud_run_etl_aemet"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+
 [tool.uv]
 package = true
-
