@@ -4,8 +4,14 @@ version = "0.1.0"
 description = "extract data from api aemet"
 readme = "README.md"
 requires-python = ">=3.11"
-authors = ["Robert Gavilanes <r.gavilanes@altostratus.es>"]
+authors = [{name = "Robert Gavilanes", email = "r.gavilanes@altostratus.es"}]
 dependencies = []
 
+[tool.setuptools]
+packages = ["cloud_run_etl_aemet"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
 [tool.uv]
 package = true
+

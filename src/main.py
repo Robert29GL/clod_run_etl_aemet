@@ -4,9 +4,9 @@ from cloudops.logging.google import get_logger
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from cloud_run_etl_template.connector import Connector
-from cloud_run_etl_template.sink import DummySink
-from cloud_run_etl_template.source import DummySource
+from cloud_run_etl_aemet.connector import Connector
+from cloud_run_etl_aemet.sink import DummySink
+from cloud_run_etl_aemet.source import DummySource
 
 logger = get_logger(__name__)
 

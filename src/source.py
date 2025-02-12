@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 from typing import TypedDict, List
-
-from cloud_run_etl_aemet.settings import settings
+from settings import settings
+#from cloud_run_etl_aemet.settings import settings
 from aemet import Aemet
 aemet_client = Aemet(api_key=settings.api_key)
 
