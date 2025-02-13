@@ -5,17 +5,18 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from cloud_run_etl_aemet.connector import Connector
-from cloud_run_etl_aemet.sink import DummySink
-from cloud_run_etl_aemet.source import DummySource
-
+#from cloud_run_etl_aemet.sink import DummySink
+#from cloud_run_etl_aemet.source import DummySource
+from cloud_run_etl_aemet.source import aemet_extract_data
+from cloud_run_etl_aemet.sink import BigQuerySink
 logger = get_logger(__name__)
 
 app = FastAPI()
 
 
 def get_connector() -> Connector:
-    source = DummySource()
-    sink = DummySink()
+    source = aemet_extract_data()
+    sink = BigQuerySink()
     return Connector(source, sink)
 
 

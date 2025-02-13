@@ -18,12 +18,14 @@ class Settings(BaseSettings):
 
     # Sink params
     table_name: str
+    table_station: str
+    dataset_name: str
 
     # Source params
     init_endpoint: str #= Field(alias="INIT_ENDPOINT")
 
     #api key
-    api_key: str #= Field(alias="APY_KEY")
+    api_key: str 
 
 
 settings = Settings()  # type: ignore
