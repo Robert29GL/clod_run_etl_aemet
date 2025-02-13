@@ -11,7 +11,7 @@ load_dotenv()
 
 class Settings(BaseSettings):
     # General params
-    #project_id: str
+    project_id: str
 
     # Connector params
     max_delta_time: timedelta

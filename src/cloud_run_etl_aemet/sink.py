@@ -19,7 +19,7 @@ class BigQuerySink:
     def __init__(self):
         self.client = bigquery.Client()
         self.dataset_id = f"{settings.project_id}.{settings.dataset_name}"
-        self.table_id = f"{self.dataset_id}.{settings.table_name}"
+        self.table_id = f"{self.dataset_id}.{settings.table_station}"
 
     def create_table_if_not_exists(self):
         # Verificar si la tabla existe
