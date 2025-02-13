@@ -1,6 +1,6 @@
 from datetime import timedelta
-from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic import Field, BaseSettings
+#from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
