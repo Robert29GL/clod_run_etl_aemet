@@ -14,7 +14,8 @@ class aemet_extract_data:
         if not estaciones_json:
             raise Exception("No se han podido obtener estaciones")
         # Convertir la cadena JSON a una lista de diccionarios
-        estaciones = json.loads(estaciones_json)
+        #estaciones = json.loads(estaciones_json)
+        estaciones = estaciones_json
         # Filtrar campos 'indicativo' y 'nombre'
         estaciones_filtradas = [
             {'indicativo': estacion['indicativo'], 'nombre': estacion['nombre']}
