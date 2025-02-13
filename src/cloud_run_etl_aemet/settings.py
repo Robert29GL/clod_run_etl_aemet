@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     table_name: str
 
     # Source params
-    endpoint: str
+    init_endpoint: str
 
     #api key
     api_key: str

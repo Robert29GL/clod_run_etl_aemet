@@ -1,60 +1,68 @@
 from datetime import datetime, timedelta
-
+import requests
 import pandas as pd
-from typing import TypedDict, List
-from settings import settings
-#from cloud_run_etl_aemet.settings import settings
-from aemet import Aemet
-aemet_client = Aemet(api_key=settings.api_key)
+from typing import TypedDict, List,Dict
+#from settings import settings
+from cloud_run_etl_aemet.settings import settings
+#from aemet import Aemet
+#aemet_client = Aemet(api_key=settings.api_key)
 
-class AemetRecord(TypedDict):
-    date: str
-    temperature: float
-    humed: float
+# class AemetRecord(TypedDict):
+#     date: str
+#     temperature: float
+#     humed: float
 
 class aemet_extract_data:
     def extract_object(
         self,
-        object_id: str,
+        station_id: str,
         start_datetime: datetime,
         end_datetime: datetime,
-    ) -> List[AemetRecord]:
-        # Call endpoint
-        _endpoint = settings.endpoint
+    ) -> List[Dict]:
+        #extract weather data from API aemet
         microbatch_duration = timedelta(days=1)
         current_start = start_datetime
-        all_records: List[AemetRecord] = []
+        all_records: List[Dict] = []
 
         while current_start < end_datetime:
             current_end = min(current_start + microbatch_duration, end_datetime)
-            
-            # Call the API (adjust the method get_data according to the aemet library)
-            response = aemet_client.get_data(
-                endpoint=_endpoint,
-                object_id=object_id,
-                start_datetime=current_start.isoformat(),
-                end_datetime=current_end.isoformat()
+            #dynamic url with params
+            endpoint_url = (
+                f"{settings.init_endpoint}/valores/climatologicos/diario/datos/"
+                f"fechaini/{current_start.strftime('%Y-%m-%d')}/"
+                f"fechafin/{current_end.strftime('%Y-%m-%d')}/"
+                f"estacion/{station_id}"
             )
-            
-            # For debugging: print the API response for each microbatch
-            print(f"Batch {current_start} to {current_end}: {response}")
-            
-            # Assume the API response is a dict with a key "data" containing a list of records.
-            batch_records: List[AemetRecord] = response.get("data", [])
-            all_records.extend(batch_records)
-            
+            params = {"api_key": settings.api_key}
+
+            # First request: get the URL for the data
+            response = requests.get(endpoint_url, params=params)
+            if response.status_code != 200:
+                raise Exception(f"Initial request error: {response.status_code} - {response.text}")
+            json_response = response.json()
+            if "datos" not in json_response:
+                raise Exception("Key 'datos' not found in AEMET response.")
+            data_url = json_response["datos"]
+
+            # Second request: fetch the actual weather data
+            data_response = requests.get(data_url)
+            if data_response.status_code != 200:
+                raise Exception(f"Data request error: {data_response.status_code} - {data_response.text}")
+            batch_data = data_response.json()  # Expected to be a list of records (each a dict)
+            all_records.extend(batch_data)
+
+            print(f"Extracted batch from {current_start} to {current_end}")
             current_start = current_end
 
         return all_records
-    
-if __name__ == "__main__":
-    
-    object_id = settings.project_id  
-    start_date = datetime(2024, 1, 1)
-    end_date = datetime(2024, 1, 3)
 
+# This block is only for testing the module directly.
+if __name__ == "__main__":
     extractor = aemet_extract_data()
-    records = extractor.extract_data(object_id, start_date, end_date)
-    
-    print("Extracted data:")
-    print(records)
+    data = extractor.extract_object(
+        station_id="3195",
+        start_datetime=datetime.fromisoformat("2025-02-03"),
+        end_datetime=datetime.fromisoformat("2025-02-04")
+    )
+    print("Extracted JSON data:")
+    print(data)
