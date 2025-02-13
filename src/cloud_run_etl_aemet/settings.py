@@ -1,11 +1,17 @@
+from dotenv import load_dotenv
 from datetime import timedelta
 #from pydantic import Field, BaseSettings
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+import os
+
+# Cargar variables de entorno desde el archivo .env
+load_dotenv()
+
 
 class Settings(BaseSettings):
     # General params
-    project_id: str
+    #project_id: str
 
     # Connector params
     max_delta_time: timedelta
@@ -20,5 +26,5 @@ class Settings(BaseSettings):
     api_key: str #= Field(alias="APY_KEY")
 
 
-
-settings = Settings(SettingsConfigDict(env_file=".env"))  # type: ignore
+settings = Settings()  # type: ignore
+#settings = Settings(SettingsConfigDict(env_file=".env"))  # type: ignore
