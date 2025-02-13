@@ -1,6 +1,6 @@
 from datetime import timedelta
-from pydantic import Field, BaseSettings
-#from pydantic_settings import BaseSettings
+#from pydantic import Field, BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -14,10 +14,11 @@ class Settings(BaseSettings):
     table_name: str
 
     # Source params
-    init_endpoint: str = Field(alias="INIT_ENDPOINT")
+    init_endpoint: str #= Field(alias="INIT_ENDPOINT")
 
     #api key
-    api_key: str = Field(alias="APY_KEY")
+    api_key: str #= Field(alias="APY_KEY")
 
 
-settings = Settings()  # type: ignore
+
+settings = Settings(SettingsConfigDict(env_file=".env"))  # type: ignore
