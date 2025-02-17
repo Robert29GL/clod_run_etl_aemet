@@ -32,3 +32,7 @@ if __name__ == "__main__":
     # Imprimir el resultado
     print("Estaciones obtenidas:")
     print(estaciones)    
+
+
+
+ 

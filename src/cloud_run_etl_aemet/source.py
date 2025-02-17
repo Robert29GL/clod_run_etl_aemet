@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta
 import requests
-import pandas as pd
-from typing import TypedDict, List, Dict
+#import pandas as pd
+from typing import  List, Dict
 from cloud_run_etl_aemet.settings import settings
-from aemet import Estacion, Aemet
-import json
+from aemet import Estacion
 
 class aemet_extract_data:
     @staticmethod
@@ -22,7 +21,7 @@ class aemet_extract_data:
             for estacion in estaciones
         ]
         return estaciones_filtradas
-
+    #@staticmethod
     def extract_object(
         self,
         station_id: str,
@@ -30,7 +29,7 @@ class aemet_extract_data:
         end_datetime: datetime,
     ) -> List[Dict]:
         # extract weather data from AEMET API
-        microbatch_duration = timedelta(days=1)
+        microbatch_duration = settings.max_delta_time
         current_start = start_datetime
         current_end = end_datetime
         all_records: List[Dict] = []
@@ -55,13 +54,14 @@ class aemet_extract_data:
             json_response = response.json()
             if "datos" not in json_response:
                 raise Exception("Key 'datos' not found in AEMET response.")
-            data_url = json_response["datos"]  # This URL is where the actual data is
+            data_url = json_response["datos"]  
 
             # Second request: Fetch the actual weather data
             data_response = requests.get(data_url)
             if data_response.status_code != 200:
-                raise Exception(f"Data request error: {data_response.status_code} - {data_response.text}")
-            
+                print(f"Error al obtener datos: {data_response.status_code} - {data_response.text}")
+                current_start = current_end
+                continue
             batch_data = data_response.json()  # This should be a list of records (each a dict)
             all_records.extend(batch_data)
 
@@ -69,14 +69,14 @@ class aemet_extract_data:
             current_start = current_end
 
         return all_records
-#limite de llamadas por minuto es de 20 dias por minuto
+# limite de llamadas por minuto es de 20 dias por minuto
 # This block is only for testing the module directly.
 # if __name__ == "__main__":
 #     extractor = aemet_extract_data()
 #     data = extractor.extract_object(
 #         station_id="3195",
-#         start_datetime=datetime.fromisoformat("2025-01-20"),
-#         end_datetime=datetime.fromisoformat("2025-02-04")
+#         start_datetime=datetime.fromisoformat("2025-02-02"),
+#         end_datetime=datetime.fromisoformat("2025-02-13")
 #     )
 #     print("Extracted JSON data:")
 #     print(data)
