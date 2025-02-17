@@ -1,12 +1,12 @@
 from datetime import datetime, timezone,timedelta
 from typing import Protocol
-
-import pandas as pd
-from cloudops.logging.google import get_logger
+from google.cloud import logging
+#from cloud_run_etl_aemet.settings import max_delta_time
+#from cloudops.logging.google import get_logger
 from cloud_run_etl_aemet.source import aemet_extract_data 
 from cloud_run_etl_aemet.settings import settings
 from cloud_run_etl_aemet.sink import BigQuerySink
-sink= BigQuerySink()
+
 class Source(Protocol):
     def extract_object(
         self,
@@ -25,14 +25,14 @@ class Sink(Protocol):
 class Connector:
     def __init__(
         self,
-        source: Source,
-        sink: Sink,
+        source: aemet_extract_data,
+        sink: BigQuerySink,
     ) -> None:
         """
         Connector class for extracting and loading data from a source to a sink.
         WORKS WITH UTC TIME ONLY, so make sure to convert to UTC before passing.
         """
-        self.logger = get_logger(__name__)
+        self.logger = logging.Client.logger("cloud_run_etl")
         self.source = source
         self.sink = sink
 
@@ -42,37 +42,30 @@ class Connector:
         (or a defined range) for a given station, and inserts the data
         into the stagin table
         """
-        last_date = self.sink.get_last_update_datetime(station_id)
-        if last_date is None:
-            # Si no hay datos previos, iniciar con un rango predeterminado
-            start_dt = datetime.now(timezone.utc) - settings.max_delta_time
-        else:
-            start_dt = last_date + timedelta(seconds=1)
-        end_dt = datetime.now(timezone.utc)
+        start_datetime = (datetime.now() - timedelta(days=15)).replace(hour=0, minute=0, second=0, microsecond=0)
+        end_datetime = (datetime.now() - timedelta(days=4)).replace(hour=0, minute=0, second=0, microsecond=0)
+        self.extract_and_load_object(station_id, start_datetime, end_datetime)
         
-        print(f"Extracting data for station {station_id} from {start_dt} to {end_dt}")
-        records = self.extract_and_load_object(station_id, start_dt, end_dt)
-        if records:
-            self.sink.insert_rows_stg(records)
-        else:
-            print("No new data to load.")
 
     def extract_and_load_object(self, station_id: str, start_datetime: datetime, end_datetime: datetime) -> None:
         """
         Extrae datos en el rango definido y los carga en el sink.
         """
-        t0 = start_datetime
-        while t0 < end_datetime:
-            t1 = min(t0 + settings.max_delta_time, end_datetime)
-            data = self.source.aemet_extract_data(station_id, t0, t1)  
-            if not data:
-                self.logger.info(
-                    f"Empty data for {station_id} from {t0} to {t1}. Skipping...",
-                )
+        self.logger.info(f"Extracting and loading data for station: {station_id} from {start_datetime} to {end_datetime}")
+        
+        current_start = start_datetime
+        while current_start < end_datetime:
+            current_end = min(current_start + settings.max_delta_time, end_datetime)
+            
+            records = self.source.extract_object(station_id, current_start, current_end)
+            
+            if not records:
+                self.logger.info(f"No data for {station_id} from {current_start} to {current_end}. Skipping...")
             else:
-                self.sink.load_object(station_id, data)
-                self.logger.info(f"Wrote data for {station_id} from {t0} to {t1}.")
-            t0 = t1        
+                self.sink.insert_rows_stg(records)
+                self.logger.info(f"Inserted {len(records)} records for {station_id} from {current_start} to {current_end}.")
+            
+            current_start = current_end  
 
     # def extract_and_load_object(
     #     self,
