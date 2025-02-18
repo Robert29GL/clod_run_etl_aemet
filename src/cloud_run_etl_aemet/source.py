@@ -29,7 +29,7 @@ class aemet_extract_data:
         end_datetime: datetime,
     ) -> List[Dict]:
         # extract weather data from AEMET API
-        microbatch_duration = settings.max_delta_time
+        microbatch_duration = settings.max_delta_time_timedelta
         current_start = start_datetime
         current_end = end_datetime
         all_records: List[Dict] = []

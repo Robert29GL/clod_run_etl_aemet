@@ -1,23 +1,18 @@
-from datetime import datetime, timedelta, timezone
-import random 
-#from cloudops.logging.google import get_logger
-#from fastapi import FastAPI
-from pydantic import BaseModel
-from cloud_run_etl_aemet.source import aemet_extract_data
-from cloud_run_etl_aemet.sink import BigQuerySink
-
+import logging
 import random
 from datetime import datetime, timedelta
-#from cloudops.logging.google import get_logger
-from google.cloud import logging
+
+
 from pydantic import BaseModel
+
 from cloud_run_etl_aemet.connector import Connector
+from cloud_run_etl_aemet.sink import BigQuerySink
+from cloud_run_etl_aemet.source import aemet_extract_data
 
-
-
-
-client = logging.Client()
-logger = client.logger("cloud_run_etl")
+#client = cloud_logging.Client()
+#client.setup_logging()
+logger = logging.getLogger("cloud_run_etl")
+logger.setLevel(logging.INFO)
 
 def get_connector() -> Connector:
     source = aemet_extract_data()
@@ -27,10 +22,10 @@ def get_connector() -> Connector:
 class IncrementalLoadRequest(BaseModel):
     station_ids: list[str]
 
-class BackfillRequest(BaseModel):
-    station_ids: list[str]
-    start_date: datetime
-    end_date: datetime
+# class BackfillRequest(BaseModel):
+#     station_ids: list[str]
+#     start_date: datetime
+#     end_date: datetime
 
 def incremental_load():
     connector = get_connector()

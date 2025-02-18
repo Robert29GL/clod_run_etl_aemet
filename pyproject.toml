@@ -5,11 +5,11 @@ description = "Extract data from API AEMET"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{name = "Robert Gavilanes", email = "r.gavilanes@altostratus.es"}]
-dependencies = []
+dependencies = [
+    "google-cloud-bigquery>=3.29.0",
+    "pydantic>=2.10.6",
+    "pydantic-settings>=2.7.1",
+    "python-aemet>=0.4.1",
+    "requests>=2.32.3",
+]
 
-[tool.setuptools]
-packages = { find = { where = ["src"] } }
-
-
-[tool.uv]
-package = true

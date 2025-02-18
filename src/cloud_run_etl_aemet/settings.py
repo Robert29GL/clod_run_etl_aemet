@@ -1,12 +1,10 @@
-from dotenv import load_dotenv
+
 from datetime import timedelta
 #from pydantic import Field, BaseSettings
 from pydantic_settings import BaseSettings
-import os
-# Cargar variables de entorno desde el archivo .env
-load_dotenv()
-# Verifica el valor cargado para MAX_DELTA_TIME
-print("MAX_DELTA_TIME:", os.getenv("MAX_DELTA_TIME"))
+
+
+
 
 class Settings(BaseSettings):
     # General params
@@ -21,7 +19,7 @@ class Settings(BaseSettings):
     dataset_name: str
 
     # Source params
-    init_endpoint: str #= Field(alias="INIT_ENDPOINT")
+    init_endpoint: str 
 
     #api key
     api_key: str 
@@ -29,5 +27,4 @@ class Settings(BaseSettings):
     def max_delta_time_timedelta(self):
         return timedelta(days=self.max_delta_time)
 
-settings = Settings()  # type: ignore
-#settings = Settings(SettingsConfigDict(env_file=".env"))  # type: ignore
+settings = Settings()  

@@ -1,8 +1,7 @@
-from datetime import datetime, timezone,timedelta
+from datetime import datetime, timedelta
 from typing import Protocol
-from google.cloud import logging
-#from cloud_run_etl_aemet.settings import max_delta_time
-#from cloudops.logging.google import get_logger
+import logging
+
 from cloud_run_etl_aemet.source import aemet_extract_data 
 from cloud_run_etl_aemet.settings import settings
 from cloud_run_etl_aemet.sink import BigQuerySink
@@ -32,7 +31,8 @@ class Connector:
         Connector class for extracting and loading data from a source to a sink.
         WORKS WITH UTC TIME ONLY, so make sure to convert to UTC before passing.
         """
-        self.logger = logging.Client.logger("cloud_run_etl")
+        #self.client = logging.Client()
+        self.logger = logging.getLogger("cloud_run_etl")
         self.source = source
         self.sink = sink
 
@@ -55,7 +55,7 @@ class Connector:
         
         current_start = start_datetime
         while current_start < end_datetime:
-            current_end = min(current_start + settings.max_delta_time, end_datetime)
+            current_end = min(current_start + settings.max_delta_time_timedelta, end_datetime)
             
             records = self.source.extract_object(station_id, current_start, current_end)
             
