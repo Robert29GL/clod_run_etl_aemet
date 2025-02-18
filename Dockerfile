@@ -12,6 +12,9 @@ COPY pyproject.toml uv.lock* /build/
 
 RUN pip install --no-cache-dir uv
 
+#install dependency from pyproject.toml
+RUN uv pip install --system .
+
 #-------------#
 # FINAL STAGE #
 #-------------#
@@ -22,8 +25,10 @@ ENV PYTHONUNBUFFERED=true
 
 #create a non-privileged user
 RUN groupadd -r appgroup \
-    && useradd appuser -r -g appgroup
+    && useradd -r -m -g appgroup appuser
 
+# Copy the executable 'uv' from build step
+COPY --from=builder --chown=appuser:appgroup /usr/local/bin/uv /usr/local/bin/uv
 COPY --from=builder --chown=appuser:appgroup /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --chown=appuser:appgroup src/ /app/src/
 
