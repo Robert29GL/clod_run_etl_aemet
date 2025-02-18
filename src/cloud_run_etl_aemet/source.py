@@ -10,7 +10,7 @@ class aemet_extract_data:
     def get_stations() -> List[Dict]:
         """Retrieves the list of weather stations and returns a list 
         of dictionaries with 'indicativo' and 'nombre'."""
-        stations_json = Estacion.get_estationes(api_key=settings.api_key)
+        stations_json = Estacion.get_estaciones(api_key=settings.api_key)
         if not stations_json:
             raise Exception("Cannot get stations")
 
