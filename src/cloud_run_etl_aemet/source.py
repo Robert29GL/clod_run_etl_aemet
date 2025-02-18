@@ -8,20 +8,20 @@ from aemet import Estacion
 class aemet_extract_data:
     @staticmethod
     def get_stations() -> List[Dict]:
-        """Obtiene la lista de estaciones meteorológicas y devuelve una lista de diccionarios con 'indicativo' y 'nombre'."""
-        estaciones_json = Estacion.get_estaciones(api_key=settings.api_key)
-        if not estaciones_json:
-            raise Exception("No se han podido obtener estaciones")
-        # Convertir la cadena JSON a una lista de diccionarios
-        #estaciones = json.loads(estaciones_json)
-        estaciones = estaciones_json
-        # Filtrar campos 'indicativo' y 'nombre'
-        estaciones_filtradas = [
+        """Retrieves the list of weather stations and returns a list 
+        of dictionaries with 'indicativo' and 'nombre'."""
+        stations_json = Estacion.get_stations(api_key=settings.api_key)
+        if not stations_json:
+            raise Exception("Cannot get stations")
+
+        stations = stations_json
+        # Filter fields 'indicativo' y 'nombre'
+        filter_stations = [
             {'indicativo': estacion['indicativo'], 'nombre': estacion['nombre']}
-            for estacion in estaciones
+            for estacion in stations
         ]
-        return estaciones_filtradas
-    #@staticmethod
+        return filter_stations
+
     def extract_object(
         self,
         station_id: str,
@@ -56,13 +56,14 @@ class aemet_extract_data:
                 raise Exception("Key 'datos' not found in AEMET response.")
             data_url = json_response["datos"]  
 
-            # Second request: Fetch the actual weather data
+            # Second request: Extracts the value of the data field from
+            #the previous request.
             data_response = requests.get(data_url)
             if data_response.status_code != 200:
                 print(f"Error al obtener datos: {data_response.status_code} - {data_response.text}")
                 current_start = current_end
                 continue
-            batch_data = data_response.json()  # This should be a list of records (each a dict)
+            batch_data = data_response.json() 
             all_records.extend(batch_data)
 
             print(f"Extracted batch from {current_start} to {current_end}")

@@ -1,7 +1,4 @@
-# from dateSTRING import dateSTRING
 import logging
-
-# import pandas as pd
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
 from cloud_run_etl_aemet.settings import settings
@@ -81,7 +78,7 @@ class BigQuerySink:
             logger.info(f"Tabla {self.table_id_stg} creada.")
 
     def insert_rows_stg(self, all_records):
-        """Inserta registros climáticos en la tabla staging de BigQuery."""
+        """Insert weather records into the BigQuery staging table."""
         rows_to_insert = []
         for data in all_records:
             try:
@@ -128,15 +125,15 @@ class BigQuerySink:
                 }
                 rows_to_insert.append(row)
             except Exception as e:
-                logger.error(f"Error procesando fila: {data} - {str(e)}")
+                logger.error(f"Error processing row: {data} - {str(e)}")
 
         if rows_to_insert:
             errors = self.client.insert_rows_json(self.table_id_stg, rows_to_insert)
             if errors:
-                logger.error(f"Errores al insertar filas en staging: {errors}")
+                logger.error(f"Errors processing rows in staging: {errors}")
             else:
                 logger.info(
-                    f"{len(rows_to_insert)} registros insertados correctamente en staging."
+                    f"{len(rows_to_insert)} records succesfuly inserted in staging."
                 )
         else:
-            logger.info("No se insertaron registros en staging.")
+            logger.info("No records were inserted in staging.")
