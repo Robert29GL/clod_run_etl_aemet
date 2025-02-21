@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import requests
-#import pandas as pd
+
 from typing import  List, Dict
 from cloud_run_etl_aemet.settings import settings
 from aemet import Estacion
@@ -60,7 +60,7 @@ class aemet_extract_data:
             #the previous request.
             data_response = requests.get(data_url)
             if data_response.status_code != 200:
-                print(f"Error al obtener datos: {data_response.status_code} - {data_response.text}")
+                print(f"Error obtaining data: {data_response.status_code} - {data_response.text}")
                 current_start = current_end
                 continue
             batch_data = data_response.json() 

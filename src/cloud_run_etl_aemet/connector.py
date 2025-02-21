@@ -49,7 +49,7 @@ class Connector:
 
     def extract_and_load_object(self, station_id: str, start_datetime: datetime, end_datetime: datetime) -> None:
         """
-        Extrae datos en el rango definido y los carga en el sink.
+        Extracts data in the defined range and loads it into the sink..
         """
         self.logger.info(f"Extracting and loading data for station: {station_id} from {start_datetime} to {end_datetime}")
         
@@ -66,26 +66,3 @@ class Connector:
                 self.logger.info(f"Inserted {len(records)} records for {station_id} from {current_start} to {current_end}.")
             
             current_start = current_end  
-
-    # def extract_and_load_object(
-    #     self,
-    #     station_id: str,
-    #     start_datetime: datetime,
-    #     end_datetime: datetime,
-    # ) -> None:
-    #     self.logger.info(
-    #         f"Extracting and loading object: {station_id}"
-    #         f" from {start_datetime} to {end_datetime}",
-    #     )
-    #     t0 = start_datetime
-    #     while t0 < end_datetime:
-    #         t1 = min(t0 + settings.max_delta_time, end_datetime)
-    #         df = self.source.extract_object(station_id, t0, t1)
-    #         if df.empty:
-    #             self.logger.info(
-    #                 f"Empty dataframe for {station_id} from {t0} to {t1}. Skipping...",
-    #             )
-    #         else:
-    #             self.sink.load_object(station_id, df)
-    #             self.logger.info(f"Wrote dataframe for {station_id}from {t0} to {t1}.")
-    #         t0 = t1
