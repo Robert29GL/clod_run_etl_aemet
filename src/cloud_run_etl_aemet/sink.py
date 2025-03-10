@@ -13,40 +13,40 @@ class BigQuerySink:
     def __init__(self):
         self.client = bigquery.Client()
         self.dataset_id = f"{settings.project_id}.{settings.dataset_name}"
-        self.table_id = f"{self.dataset_id}.{settings.table_station}"
+       # self.table_id = f"{self.dataset_id}.{settings.table_station}"
         self.table_id_stg = f"{self.dataset_id}.{settings.table_name}"
 
-    def create_table_if_not_exists(self):
-        """Verifica si la tabla de estaciones existe, y la crea si no."""
-        try:
-            self.client.get_table(self.table_id)
-            logger.info(f"Tabla {self.table_id} ya existe.")
-        except NotFound:
-            schema = [
-                bigquery.SchemaField("indicativo", "STRING"),
-                bigquery.SchemaField("nombre", "STRING"),
-            ]
-            table = bigquery.Table(self.table_id, schema=schema)
-            self.client.create_table(table)
-            logger.info(f"Tabla {self.table_id} creada.")
+    # def create_table_if_not_exists(self):
+    #     """Verifica si la tabla de estaciones existe, y la crea si no."""
+    #     try:
+    #         self.client.get_table(self.table_id)
+    #         logger.info(f"Tabla {self.table_id} ya existe.")
+    #     except NotFound:
+    #         schema = [
+    #             bigquery.SchemaField("indicativo", "STRING"),
+    #             bigquery.SchemaField("nombre", "STRING"),
+    #         ]
+    #         table = bigquery.Table(self.table_id, schema=schema)
+    #         self.client.create_table(table)
+    #         logger.info(f"Tabla {self.table_id} creada.")
 
-    def insert_stations(self, stations):
-        """Inserta la lista de estaciones en BigQuery."""
-        rows_to_insert = [
-            {"indicativo": station["indicativo"], "nombre": station["nombre"]}
-            for station in stations
-        ]
-        errors = self.client.insert_rows_json(self.table_id, rows_to_insert)
-        if errors:
-            logger.error(f"Errores al insertar estaciones: {errors}")
-        else:
-            logger.info(f"{len(rows_to_insert)} estaciones insertadas correctamente.")
+    # def insert_stations(self, stations):
+    #     """Inserta la lista de estaciones en BigQuery."""
+    #     rows_to_insert = [
+    #         {"indicativo": station["indicativo"], "nombre": station["nombre"]}
+    #         for station in stations
+    #     ]
+    #     errors = self.client.insert_rows_json(self.table_id, rows_to_insert)
+    #     if errors:
+    #         logger.error(f"Errores al insertar estaciones: {errors}")
+    #     else:
+    #         logger.info(f"{len(rows_to_insert)} estaciones insertadas correctamente.")
 
     def create_table_if_not_exists_stg(self):
-        """Verifica si la tabla de datos climáticos existe, y la crea si no."""
+        """Checks if the stagging table exists, and creates it if not."""
         try:
             self.client.get_table(self.table_id_stg)
-            logger.info(f"Tabla {self.table_id_stg} ya existe.")
+            logger.info(f"The {self.table_id_stg} table already exists.")
         except NotFound:
             schema = [
                 bigquery.SchemaField("fecha", "DATE"),
@@ -75,7 +75,7 @@ class BigQuerySink:
             ]
             table = bigquery.Table(self.table_id_stg, schema=schema)
             self.client.create_table(table)
-            logger.info(f"Tabla {self.table_id_stg} creada.")
+            logger.info(f"Table {self.table_id_stg} created.")
 
     def insert_rows_stg(self, all_records):
         """Insert weather records into the BigQuery staging table."""
