@@ -9,8 +9,6 @@ from cloud_run_etl_aemet.connector import Connector
 from cloud_run_etl_aemet.sink import BigQuerySink
 from cloud_run_etl_aemet.source import aemet_extract_data
 
-#client = cloud_logging.Client()
-#client.setup_logging()
 logger = logging.getLogger("cloud_run_etl")
 logger.setLevel(logging.INFO)
 
@@ -30,16 +28,16 @@ class IncrementalLoadRequest(BaseModel):
 def incremental_load():
     connector = get_connector()
 
-    # Obtener la lista de estaciones desde la API
+    # get list stations from API
     stations = aemet_extract_data.get_stations()
     if not stations:
-        logger.info("No se encontraron estaciones disponibles.")
+        logger.info("Not found available stations.")
         return
 
     # Seleccionar aleatoriamente una estación para procesar
     selected_station = random.choice(stations)
     station_id = selected_station["indicativo"]
-    logger.info(f"Procesando estación: {station_id} - {selected_station['nombre']}")
+    logger.info(f"Processing station: {station_id} - {selected_station['nombre']}")
 
     # Definir el rango de fechas según la lógica establecida
     start_datetime = (datetime.now() - timedelta(days=15)).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -57,7 +55,7 @@ def backfill(start_date: datetime, end_date: datetime):
     # get list station from API Aemet
     stations = aemet_extract_data.get_stations()
     if not stations:
-        logger.info("No se encontraron estaciones disponibles.")
+        logger.info("Not foun available stations.")
         return
 
     # Randomly select a station to process
@@ -71,5 +69,5 @@ def backfill(start_date: datetime, end_date: datetime):
 if __name__ == "__main__":
     logger.info("Starting ETL process...")
 
-    # Run incremental load by default
+    # Run incremental load
     incremental_load()
