@@ -34,19 +34,22 @@ def incremental_load():
         logger.info("Not found available stations.")
         return
 
-    # Seleccionar aleatoriamente una estación para procesar
+    # Ramdomly selecting a station for processing
     selected_station = random.choice(stations)
     station_id = selected_station["indicativo"]
     logger.info(f"Processing station: {station_id} - {selected_station['nombre']}")
 
-    # Definir el rango de fechas según la lógica establecida
+    # A date range is set to load in the variable start_datetime the last 15 days.
+    # In the variable end_datetime the last 4 days with respect to the current date.
+    # The last 4 days are collected, since after several test it is detected that the API doesn't return
+    # current data in most of the stations.
     start_datetime = (datetime.now() - timedelta(days=15)).replace(hour=0, minute=0, second=0, microsecond=0)
     end_datetime = (datetime.now() - timedelta(days=4)).replace(hour=0, minute=0, second=0, microsecond=0)
 
     logger.info(f"start_datetime: {start_datetime}")
     logger.info(f"end_datetime: {end_datetime}")
 
-    # Ejecutar carga incremental
+    # Execute incremental load
     connector.incremental_load(station_id)
 
 def backfill(start_date: datetime, end_date: datetime):
